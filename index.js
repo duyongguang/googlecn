@@ -1,5 +1,5 @@
+
 var https = require('https');
-var request = require('request');  
 var languages = {
     'auto': 'Automatic',
     'af': 'Afrikaans',
