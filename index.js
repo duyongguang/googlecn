@@ -1,4 +1,4 @@
-
+var https = require('https');
 var request = require('request');  
 var languages = {
     'auto': 'Automatic',
@@ -171,35 +171,42 @@ var updateTKK = function() {
     return new Promise(function (resolve, reject) {
         //cache tk 1 hour
         if (Number(window.TKK.split('.')[0]) === Math.floor(Date.now() / 3600000) ) {
-            resolve();
+                resolve();
         }else{
-            var header={
-                'Referer':'https://translate.google.cn',
-                'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-                'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:40.0) Gecko/20100101 Firefox/40.1', 
-                'Host':'translate.google.cn'
-            }; 
-            request({
-            	headers:header,
-                uri:'https://translate.google.cn',
-                timeout: 90000,
-                method: "GET",
-                json:true
-            }, function(error, response, body) {
-                if(error){
-                    reject(error);
-                }else{
-                    var code = body.match(/TKK=(.*?)\(\)\)'\);/g);
-                    if (code) {
-                        eval(code[0]); 
-                        if (typeof TKK !== 'undefined') {
-                            window.TKK = TKK;
-                            global.TKK = TKK; 
-                        } 
-                    }
-                    resolve();
-                }
-            }); 
+                var options = {
+                    hostname: 'translate.google.cn',
+                    port: 443,
+                    headers:{
+                        'Referer':'https://translate.google.cn',
+                        'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                        'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:40.0) Gecko/20100101 Firefox/40.1', 
+                        'Host':'translate.google.cn'
+                    },
+                    path: '/',
+                    method: 'GET'
+                };
+                var req = https.request(options, (res) => {
+                        res.setEncoding('utf8');
+            			var data = '';
+            			res.on('data', function (chunk) {
+            				data += chunk;
+            			}); 
+            			res.on('end', function () { 
+            				var code = data.match(/TKK=(.*?)\(\)\)'\);/g); 
+                            if (code) {
+                                eval(code[0]); 
+                                if (typeof TKK !== 'undefined') {
+                                    window.TKK = TKK;
+                                    global.TKK = TKK; 
+                                } 
+                            }
+                            resolve(); 
+            			});
+                });
+                req.on('error', (e) => {
+                    reject(e);
+                });
+                req.end();
         }
     });
 }
@@ -222,7 +229,8 @@ var translate=function(text, opts) {
     opts.to =  languages[opts.to];
     
     return token_get(text).then(function (token){
-            var url = 'https://translate.google.cn/translate_a/single';
+            //console.log(token);
+            var url = '/translate_a/single';
             var data = {
                 client: 't',
                 sl: opts.from,
@@ -251,31 +259,39 @@ var translate=function(text, opts) {
             var posturl=url + '?' + arr.join('&');
             //console.log(posturl);
             return posturl;
-    }).then(function (url) { 
+    }).then(function (path) { 
             return new Promise(function(resolve, reject) {
-                    var header={
+                    var options = {
+                        hostname: 'translate.google.cn',
+                        port: 443,
+                        headers:{
                             'Referer':'https://translate.google.cn',
                             'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
                             'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:40.0) Gecko/20100101 Firefox/40.1', 
                             'Host':'translate.google.cn'
-                    }; 
-                    request({
-                        	headers:header,
-                            uri:url,
-                            timeout: 90000,
-                            method: "GET",
-                            json:true
-                    }, function(error, response, body) {
-                            if(error){
-                                reject(error);
-                            }else{
+                        },
+                        path: path,
+                        method: 'GET'
+                    };
+                    var req = https.request(options, (res) => {
+                            res.setEncoding('utf8');
+                			var data = '';
+                			res.on('data', function (chunk) {
+                				data += chunk;
+                			}); 
+                			res.on('end', function () { 
+                                var body=JSON.parse(data);
                                 var translation=body[0][0][0];
                                 var source=body[0][0][1];
                                 var result={source:source,translation:translation};
                                 //console.log(result);
-                                resolve(result);
-                            }
+                                resolve(result); 
+                			});
                     });
+                    req.on('error', (e) => {
+                        reject(e);
+                    });
+                    req.end();
             }); 
     });
 }

@@ -4,9 +4,6 @@
     "email": "yongguangdu@gmail.com",
     "url": "http://nodeclass.com"
   },
-  "dependencies": {
-    "request": "^2.64.0"
-  },
   "description": "A free and unlimited API for Google Translate in China mainland",
   "homepage": "https://github.com/duyongguang/googlecn",
   "keywords": ["translate","translator","google"],
