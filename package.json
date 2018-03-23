@@ -1,17 +1,24 @@
 {
-  "author": {
-    "name": "duyongguang",
-    "email": "yongguangdu@gmail.com",
-    "url": "http://nodeclass.com"
-  },
+  "author": "duyongguang <yongguangdu@gmail.com> (http://nodeclass.com)",
   "description": "A free and unlimited API for Google Translate in China mainland",
   "homepage": "https://github.com/duyongguang/googlecn",
-  "keywords": ["translate","translator","google"],
+  "keywords": [
+    "translate",
+    "translator",
+    "google"
+  ],
   "main": "index.js",
   "name": "googlecn",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/duyongguang/googlecn.git"
   },
-  "version": "1.0.0"
+  "version": "1.0.0",
+  "bugs": {
+    "url": "https://github.com/duyongguang/googlecn/issues"
+  },
+  "scripts": {
+    "test": "node test.js"
+  },
+  "license": "ISC"
 }
