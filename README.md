@@ -1,9 +1,18 @@
 # googlecn
-A free and unlimited API for Google Translate in China mainland
 
-# example
-git clone https://github.com/duyongguang/googlecn.git
+模拟浏览器访问 https://translate.google.cn ，获取谷歌免费机翻结果
 
-cd googlecn
+## 安装
 
-node test.js
+npm install googlecn
+
+## 用法
+
+```js
+var translate = require('googlecn');
+translate('this is China.', {from: 'en', to: 'zh-CN'}).then(result => {
+        console.log(result);
+}).catch(error => {
+        console.log(error);
+}); 
+```
